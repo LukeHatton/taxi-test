@@ -63,6 +63,7 @@ docker run --name elastic-hq --network=bridge-skywalking \
 # 因为最新的7版本的redis可能在使用上有修改的地方，还是使用上一个大版本的redis
 docker run --name  skywalking-redis \
 --network=bridge-skywalking \
+-p 6379:6379 \
 -d redis:6.2.7
 ```
 
