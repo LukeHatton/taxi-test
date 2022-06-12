@@ -57,6 +57,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- springboot配置文件处理器相关的依赖，只是用来消除警告信息 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
         <!-- 解决在arm芯片上运行报错：file not found问题 -->
         <dependency>
             <groupId>io.netty</groupId>
