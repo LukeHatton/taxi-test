@@ -1,0 +1,43 @@
+server:
+  address: 0.0.0.0
+  port: 8080
+logging:
+  level:
+    root: info
+spring:
+  application:
+    name: taxi-gateway
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/taxi_db
+    username: root
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+    # 网关路由配置
+    gateway:
+      routes:
+        - id: taxi-order
+          uri: lb://taxi-order
+          predicates:
+            - Path=/order/**
+          filters:
+            - StripPrefix=order
+        - id: taxi-driver
+          uri: lb://taxi-driver
+          predicates:
+            - Path=/driver/**
+        - id: taxi-user
+          uri: lb://taxi-user
+          predicates:
+            - Path=/user/**

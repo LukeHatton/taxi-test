@@ -32,6 +32,12 @@ public class OrderController {
     return taxiOrderRepository.findById(id).orElse(null);
   }
 
+  @RequestMapping("/order/findById")
+  public TaxiOrder getOrderById2(Long id) {
+    log.info("==> 进入了【Order】findById方法！");
+    return taxiOrderRepository.findById(id).orElse(null);
+  }
+
   @RequestMapping("/findByUser")
   public List<TaxiOrder> getOrderByUser(Long id) {
     log.info("==> 进入了【Order】findByUser方法！");

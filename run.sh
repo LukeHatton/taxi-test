@@ -10,6 +10,14 @@ docker run --name skywalking-server --network=bridge-skywalking -p 1234:1234 -p 
 # UI – oap address必须指定使用http协议，否则会出现前端错误
 docker run --name skywalking-ui --network=bridge-skywalking -p 8080:8080 -e SW_OAP_ADDRESS=http://skywalking-server:12800 -e TZ=Asia/Shanghai -d apache/skywalking-ui:8.3.0
 
+# 还是没有端点数据，感觉可能是探针的问题，使用最新版本的server + ui + agent试一试
+# ES
+docker run --name skywalking-es --network=bridge-skywalking -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e ES_JAVA_OPTS="-Xms128m -Xmx512m" -e TZ=Asia/Shanghai -d elasticsearch:7.14.2
+# Server
+docker run --name skywalking-server --network=bridge-skywalking -p 1234:1234 -p 11800:11800 -p 12800:12800 -e SW_STORAGE=elasticsearch -e SW_STORAGE_ES_CLUSTER_NODES=skywalking-es:9200 -e TZ=Asia/Shanghai -d apache/skywalking-oap-server:latest
+# UI
+docker run --name skywalking-ui --network=bridge-skywalking -p 8080:8080 -e SW_OAP_ADDRESS=http://skywalking-server:12800 -e TZ=Asia/Shanghai -d apache/skywalking-ui:latest
+
 # arm设备
 # ElasticSearch
 docker run --name skywalking-es --network=bridge-skywalking -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e ES_JAVA_OPTS="-Xms128m -Xmx512m" -e TZ=Asia/Shanghai -d elasticsearch:7.14.2
