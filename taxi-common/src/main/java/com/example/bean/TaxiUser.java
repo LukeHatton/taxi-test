@@ -1,4 +1,4 @@
-package com.example.taxiorder.bean;
+package com.example.bean;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Date;
 
 /**
  * <p>Project: taxi
@@ -21,26 +20,18 @@ import java.util.Date;
  * @author lizhao 2022/6/10
  */
 @Entity
-@Getter
 @Setter
+@Getter
 @Builder
-@Table(name = "taxi_order")
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaxiOrder {
+@Table(name = "taxi_user")
+public class TaxiUser {
+
   @Id
   @GeneratedValue
   private Long id;
 
-  @Column(name = "order_name", length = 64)
-  private String orderName;
-
-  @Column(name = "order_time")
-  private Date orderTime;
-
-  @Column(name = "from_user")
-  private Long fromUser;
-
-  @Column(name = "to_driver")
-  private Long toDriver;
+  @Column(name = "name")
+  private String name;
 }

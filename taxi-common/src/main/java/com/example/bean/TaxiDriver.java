@@ -1,4 +1,4 @@
-package com.example.taxidriver.bean;
+package com.example.bean;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

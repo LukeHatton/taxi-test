@@ -1,9 +1,8 @@
 package com.example.taxidriver.controller;
 
-import com.example.taxidriver.bean.TaxiDriver;
+import com.example.bean.TaxiDriver;
 import com.example.taxidriver.repository.TaxiDriverRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

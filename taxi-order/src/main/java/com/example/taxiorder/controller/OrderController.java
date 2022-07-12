@@ -1,6 +1,6 @@
 package com.example.taxiorder.controller;
 
-import com.example.taxiorder.bean.TaxiOrder;
+import com.example.bean.TaxiOrder;
 import com.example.taxiorder.repository.TaxiOrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
