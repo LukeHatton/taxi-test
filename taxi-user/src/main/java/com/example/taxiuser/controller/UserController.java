@@ -1,6 +1,8 @@
 package com.example.taxiuser.controller;
 
+import com.example.bean.TaxiOrder;
 import com.example.bean.TaxiUser;
+import com.example.taxiorder.OrderFeign;
 import com.example.taxiuser.repository.TaxiUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * <p>Project: taxi
@@ -22,8 +26,11 @@ public class UserController {
 
   private final TaxiUserRepository taxiUserRepository;
 
-  public UserController(TaxiUserRepository taxiUserRepository) {
+  private final OrderFeign orderFeign;
+
+  public UserController(TaxiUserRepository taxiUserRepository, OrderFeign orderFeign) {
     this.taxiUserRepository = taxiUserRepository;
+    this.orderFeign = orderFeign;
   }
 
   @RequestMapping("/findById")
@@ -40,6 +47,10 @@ public class UserController {
       .uri("http://localhost:8081/findByUser")
       .retrieve()
       .toEntity(String.class);
-    return mono.block();
+    List<TaxiOrder> orderByUser = orderFeign.getOrderByUser(id);
+    ResponseEntity<String> entity = mono.block();
+    log.info("==> 通过WebClient得到的响应：" + (entity != null ? entity.getBody() : ""));
+    log.info("==> 通过openFeign得到的响应：" + orderByUser.toString());
+    return entity;
   }
 }

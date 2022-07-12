@@ -9,12 +9,14 @@ import java.util.List;
 /**
  * project : taxi-test
  * <p>description:
+ * taxi-order远程调用接口
  *
  * @author : consi
  * @since : 2022/7/12
  **/
 @FeignClient("taxi-order")
 public interface OrderFeign {
+
   @RequestMapping("/findById")
   TaxiOrder getOrderById(Long id);
 

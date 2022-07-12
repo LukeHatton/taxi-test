@@ -1,7 +1,9 @@
 package com.example.taxidriver.controller;
 
 import com.example.bean.TaxiDriver;
+import com.example.bean.TaxiOrder;
 import com.example.taxidriver.repository.TaxiDriverRepository;
+import com.example.taxiorder.OrderFeign;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * <p>Project: taxi
@@ -23,8 +27,11 @@ public class DriverController {
 
   private final TaxiDriverRepository taxiDriverRepository;
 
-  public DriverController(TaxiDriverRepository taxiDriverRepository) {
+  private final OrderFeign orderFeign;
+
+  public DriverController(TaxiDriverRepository taxiDriverRepository, OrderFeign orderFeign) {
     this.taxiDriverRepository = taxiDriverRepository;
+    this.orderFeign = orderFeign;
   }
 
   @RequestMapping("/findById")
@@ -43,7 +50,11 @@ public class DriverController {
     log.info("==> 进入了【Driver】getDriverOrderWithRestTemplate方法！");
     RestTemplate restTemplate = new RestTemplate();
     String url = "http://localhost:8081/findByDriver";
-    return restTemplate.getForEntity(url, String.class, id);
+    ResponseEntity<String> entity = restTemplate.getForEntity(url, String.class, id);
+    List<TaxiOrder> orderByDriver = orderFeign.getOrderByDriver(id);
+    log.info("==> 通过restTemplate得到的响应：" + entity.getBody());
+    log.info("==> 通过openFeign得到的响应：" + orderByDriver.toString());
+    return entity;
   }
 
   /**

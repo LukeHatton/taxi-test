@@ -32,12 +32,16 @@ spring:
           predicates:
             - Path=/order/**
           filters:
-            - StripPrefix=order
+            - StripPrefix=1
         - id: taxi-driver
           uri: lb://taxi-driver
           predicates:
             - Path=/driver/**
+          filters:
+            - StripPrefix=1
         - id: taxi-user
           uri: lb://taxi-user
           predicates:
             - Path=/user/**
+          filters:
+            - StripPrefix=1

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,6 +28,7 @@ import java.util.Date;
 @Table(name = "taxi_order")
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class TaxiOrder {
   @Id
   @GeneratedValue
