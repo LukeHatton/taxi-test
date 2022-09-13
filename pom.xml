@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.0</version>
+        <version>2.7.3</version>
         <relativePath/>
     </parent>
     <groupId>com.example</groupId>
@@ -21,11 +21,13 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>taxi</name>
     <description>taxi</description>
+
     <properties>
         <java.version>11</java.version>
-        <consul.discovery.version>3.1.1</consul.discovery.version>
-        <openfeign.version>3.1.1</openfeign.version>
+        <spring.cloud.starter.version>3.1.4</spring.cloud.starter.version>
+        <consul.discovery.version>3.1.2</consul.discovery.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -46,6 +48,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>netty-resolver-dns-native-macos</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -63,42 +71,45 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- consul -->
+        <!-- spring cloud alibaba nacos -->
+        <!--  注意不要升级到2021.1版本，因为那个版本匹配的springboot和spring cloud与2021.0.1.x版本的nacos不一致-->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-consul-core</artifactId>
-            <version>${consul.discovery.version}</version>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+            <version>2021.0.1.0</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
-            <version>${consul.discovery.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring-cloud-commons</artifactId>
-                    <groupId>org.springframework.cloud</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-cloud-context</artifactId>
-                    <groupId>org.springframework.cloud</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-cloud-starter</artifactId>
-                    <groupId>org.springframework.cloud</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+            <version>2021.0.1.0</version>
         </dependency>
         <!-- OpenFeign -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
-            <version>${openfeign.version}</version>
+            <version>${spring.cloud.starter.version}</version>
+        </dependency>
+        <!-- sleuth & zipkin -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+            <version>${spring.cloud.starter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-sleuth-zipkin</artifactId>
+            <version>${spring.cloud.starter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+            <version>${spring.cloud.starter.version}</version>
         </dependency>
         <!-- fastjson -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>2.0.7</version>
+            <version>2.0.13</version>
         </dependency>
         <!-- springboot配置文件处理器相关的依赖，只是用来消除警告信息 -->
         <dependency>
@@ -110,7 +121,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-resolver-dns-native-macos</artifactId>
-            <version>4.1.77.Final</version>
+            <version>4.1.81.Final</version>
             <classifier>osx-aarch_64</classifier>
         </dependency>
 

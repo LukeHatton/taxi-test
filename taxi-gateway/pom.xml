@@ -14,7 +14,7 @@
     <description>taxi-gateway</description>
     <properties>
         <java.version>11</java.version>
-        <spring.cloud.gateway.version>3.1.1</spring.cloud.gateway.version>
+        <spring.cloud.gateway.version>3.1.4</spring.cloud.gateway.version>
     </properties>
 
     <dependencies>

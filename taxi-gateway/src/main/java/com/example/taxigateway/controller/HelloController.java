@@ -1,4 +1,4 @@
-package com.example.taxigatewat.controller;
+package com.example.taxigateway.controller;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;

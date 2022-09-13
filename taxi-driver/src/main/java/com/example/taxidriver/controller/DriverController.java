@@ -49,7 +49,7 @@ public class DriverController {
   public ResponseEntity<String> getDriverOrderWithRestTemplate(Long id) {
     log.info("==> 进入了【Driver】getDriverOrderWithRestTemplate方法！");
     RestTemplate restTemplate = new RestTemplate();
-    String url = "http://localhost:8081/findByDriver";
+    String url = "http://localhost:8080/order/findByDriver";
     ResponseEntity<String> entity = restTemplate.getForEntity(url, String.class, id);
     List<TaxiOrder> orderByDriver = orderFeign.getOrderByDriver(id);
     log.info("==> 通过restTemplate得到的响应：" + entity.getBody());
@@ -67,7 +67,7 @@ public class DriverController {
     log.info("==> 进入了【Driver】getDriverOrderWithWebClient方法！");
     Mono<ResponseEntity<String>> mono = WebClient.create()
       .get()
-      .uri("http://localhost:8081/findByDriver", id)
+      .uri("http://localhost:8080/order/findByDriver", id)
       .retrieve()
       .toEntity(String.class);
     // 以下相当于声明了两个mono的消费者，同一个消息会被每个监听者单独消费

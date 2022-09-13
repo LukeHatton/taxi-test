@@ -44,7 +44,7 @@ public class UserController {
     log.info("==> 进入了【User】getUserOrderWithWebClient方法！");
     Mono<ResponseEntity<String>> mono = WebClient.create()
       .get()
-      .uri("http://localhost:8081/findByUser")
+      .uri("http://localhost:8080/user/findByUser")
       .retrieve()
       .toEntity(String.class);
     List<TaxiOrder> orderByUser = orderFeign.getOrderByUser(id);
