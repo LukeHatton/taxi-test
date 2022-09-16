@@ -1,6 +1,6 @@
-<mark>本项目为skywalking测试工程</mark>
+[TOC]
 
-### 需要安装的其他程序
+# 需要安装的其他程序
 
 1. ElasticSearch
 2. redis
@@ -8,13 +8,13 @@
 4. skywalking oap server
 5. skywalking ui
 
-### docker安装脚本——以ElasticSearch作为后端存储
+## docker安装脚本——以ElasticSearch作为后端存储
 首先要创建用户定义网络，上述的几个容器全部都要连接到这个网络中
 ```shell
 docker network create bridge-skywalking
 ```
 
-#### ElasticSearch
+### ElasticSearch
 
 ```shell
 docker run --name skywalking-es --network=bridge-skywalking \
@@ -44,7 +44,7 @@ discovery.zen.minimum_master_nodes: 1
 docker restart skywalking-es
 ```
 
-#### ElasticSearch HQ
+### ElasticSearch HQ
 如果使用的是7及7以前版本的ES，可以安装这个ElasticSearch的GUI工具
 
 > ElasticSearch HQ因为ES版本迭代过快，已经停止了对于8及更高版本的适配
@@ -55,7 +55,9 @@ docker run --name elastic-hq --network=bridge-skywalking \
 -d elastichq/elasticsearch-hq
 ```
 
-#### redis
+---
+
+## redis
 
 主要是作为应用缓存，之后在skywalking gui中可以查看是否能够检测到应用程序对于redis的依赖
 
@@ -67,7 +69,9 @@ docker run --name  skywalking-redis \
 -d redis:6.2.7
 ```
 
-#### mysql
+---
+
+## mysql
 
 主要作为应用数据库，之后在skywalking gui中可以查看是否能够检测到应用程序对于mysql的依赖
 
@@ -80,7 +84,9 @@ docker run --name skywalking-mysql -p 3306:3306 -p 33060:33060 \
 -d arm64v8/mysql:oracle
 ```
 
-#### skywalking oap server
+---
+
+## skywalking oap server
 
 这是skywalking的服务端
 
@@ -93,7 +99,9 @@ docker run --name skywalking-server \
 -d apache/skywalking-oap-server:8.9.1
 ```
 
-#### skywalking ui
+---
+
+## skywalking ui
 
 这是skywalking的网页gui服务
 
@@ -105,8 +113,7 @@ docker run --name skywalking-ui \
 -d apache/skywalking-ui:8.9.1
 ```
 
-全部5个容器启动成功后，查看localhost:8080（配置的skywalking ui的映射端口），如果有显示，就说明
-ES和skywalking配置成功了。关于mysql和redis，可以使用客户端连接看一下是否成功启动了
+全部5个容器启动成功后，查看localhost:8080（配置的skywalking ui的映射端口），如果有显示，就说明ES和skywalking配置成功了。关于mysql和redis，可以使用客户端连接看一下是否成功启动了
 
 ### docker安装脚本——以MySQL作为后端存储
 
@@ -162,8 +169,121 @@ docker start skywalking-server-test
 docker run --name skywalking-ui-test --network=mysql-test -p 8080:8080 -e SW_OAP_ADDRESS="skywalking-server-test:12800" -e TZ=Asia/Shanghai -d apache/skywalking-ui:8.9.1
 ```
 
+---
 
+## spring cloud alibaba
 
+测试使用spring cloud alibaba套件，包括：
 
+- **nacos**
 
+  作为注册中心和配置中心
+
+- **sentinel**
+
+  作为流量治理框架
+
+其中为了简便起见，链路追踪技术使用了zipkin
+
+### zipkin安装
+
+zipkin server docker安装脚本
+
+```shell
+docker pull openzipkin/zipkin:2.23
+docker run --name zipkin-quick -e TZ=Asia/Shanghai -p 9411:9411 openzipkin/zipkin:2.23
+```
+
+客户端依赖
+
+```xml
+<!-- sleuth & zipkin -->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-sleuth</artifactId>
+    <version>${spring.cloud.starter.version}</version>
+    <exclusions>
+        <exclusion>
+            <artifactId>brave</artifactId>
+            <groupId>io.zipkin.brave</groupId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-sleuth-zipkin</artifactId>
+    <version>${spring.cloud.starter.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+    <version>${spring.cloud.starter.version}</version>
+</dependency>
+```
+
+### nacos安装
+
+nacos server docker安装
+
+```shell
+# dockerhub没有v2.1.1的官方arm镜像，但是有一个v2.1.1-slim的arm镜像
+docker pull nacos/nacos-server:v2.1.1-slim
+docker run --name nacos-quick -e MODE=standalone -e TZ=Asia/Shanghai -p 8848:8848 -d nacos/nacos-server:v2.1.1
+```
+
+客户端依赖
+
+```xml
+<!-- spring cloud alibaba nacos -->
+<!--  注意不要升级到2021.1版本，因为那个版本匹配的springboot和spring cloud与2021.0.1.x版本的nacos不一致-->
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+    <version>2021.0.1.0</version>
+    <exclusions>
+        <exclusion>
+            <artifactId>spring-cloud-commons</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+        </exclusion>
+        <exclusion>
+            <artifactId>spring-cloud-context</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+    <version>2021.0.1.0</version>
+    <exclusions>
+        <exclusion>
+            <artifactId>spring-cloud-commons</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+        </exclusion>
+        <exclusion>
+            <artifactId>spring-cloud-context</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+        </exclusion>
+    </exclusions>
+</dependency>
+```
+
+### Sentinel安装
+
+dashboard server安装
+
+```shell
+# TODO
+```
+
+客户端依赖
+
+```xml
+<!-- 对应springboot 2.6.3版本以上，需要使用2021.0.1.x版本的sentinel -->
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+    <version>2021.0.1.0</version>
+</dependency>
+```
 

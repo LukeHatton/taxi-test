@@ -2,7 +2,6 @@ package com.example.taxiuser.baeldung;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.junit.jupiter.api.AfterEach;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -26,6 +25,7 @@ public class HikariCPDemo {
     config.setAutoCommit(false);
     config.setIdleTimeout(60 * 1000);
     config.setConnectionTimeout(10 * 1000);
+    config.setDriverClassName("com.mysql.cj.jdbc.Driver");
     Properties properties = new Properties();
     properties.setProperty("minimumIdle", "5");
     properties.setProperty("maximumPoolSize", "25");
