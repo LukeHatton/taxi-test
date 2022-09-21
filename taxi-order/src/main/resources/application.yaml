@@ -29,3 +29,10 @@ spring:
       # 注册中心
       config:
         server-addr: 127.0.0.1:8848
+seata:
+  tx-service-group: app-taxi
+  service:
+    vgroup-mapping:
+      app-taxi: default
+    grouplist:
+      default: localhost:8091

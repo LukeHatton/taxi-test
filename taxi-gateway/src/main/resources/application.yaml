@@ -26,7 +26,7 @@ spring:
     sampler:
       probability: 1
   cloud:
-    # 网关路由配置
+    # 网关路由配置，已经使用了默认的负载均衡配置：round robin
     gateway:
       routes:
         - id: taxi-order
@@ -54,3 +54,10 @@ spring:
       # 注册中心
       config:
         server-addr: 127.0.0.1:8848
+seata:
+  tx-service-group: app-taxi
+  service:
+    vgroup-mapping:
+      app-taxi: default
+    grouplist:
+      default: localhost:8091

@@ -32,6 +32,7 @@ spring:
       # 注册中心
       config:
         server-addr: 127.0.0.1:8848
+# 只有feign的客户端需要配置这个
 feign:
   compression:
     request:
@@ -40,3 +41,10 @@ feign:
       mime-types: text/html,json/application,xml/application
     response:
       enabled: true
+seata:
+  tx-service-group: app-taxi
+  service:
+    vgroup-mapping:
+      app-taxi: default
+    grouplist:
+      default: localhost:8091

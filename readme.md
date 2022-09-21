@@ -173,6 +173,8 @@ docker run --name skywalking-ui-test --network=mysql-test -p 8080:8080 -e SW_OAP
 
 ## spring cloud alibaba
 
+<mark>使用spring cloud alibaba相关组件时，务必注意与spring cloud和spring boot的对应关系，版本不兼容轻则导致项目编译或启动失败，重则在项目运行时出现不可名状的bug</mark>
+
 测试使用spring cloud alibaba套件，包括：
 
 - **nacos**
@@ -185,13 +187,21 @@ docker run --name skywalking-ui-test --network=mysql-test -p 8080:8080 -e SW_OAP
 
 其中为了简便起见，链路追踪技术使用了zipkin
 
+### docker安装：添加用户定义网络
+
+如果要使用spring cloud alibaba组件，组件之间经常也需要交互，如seata server就可以将自己注册到nacos中。因此，需要使用用户定义网络，来允许组件容器之间互相发现
+
+```shell
+docker network create bridge-taxi
+```
+
 ### zipkin安装
 
 zipkin server docker安装脚本
 
 ```shell
 docker pull openzipkin/zipkin:2.23
-docker run --name zipkin-quick -e TZ=Asia/Shanghai -p 9411:9411 openzipkin/zipkin:2.23
+docker run --name zipkin-quick --network=bridge-taxi -e TZ=Asia/Shanghai -p 9411:9411 -d openzipkin/zipkin:2.23
 ```
 
 客户端依赖
@@ -223,12 +233,17 @@ docker run --name zipkin-quick -e TZ=Asia/Shanghai -p 9411:9411 openzipkin/zipki
 
 ### nacos安装
 
+[nacos 2.0版本兼容性文档](https://nacos.io/zh-cn/docs/2.0.0-compatibility.html)
+
+> 在nacos升级到2.0版本后，增加了对grpc协议的支持，需要新增开通两个端口：9848和9849
+
 nacos server docker安装
 
 ```shell
-# dockerhub没有v2.1.1的官方arm镜像，但是有一个v2.1.1-slim的arm镜像
-docker pull nacos/nacos-server:v2.1.1-slim
-docker run --name nacos-quick -e MODE=standalone -e TZ=Asia/Shanghai -p 8848:8848 -d nacos/nacos-server:v2.1.1
+# dockerhub没有v2.0.4的官方arm镜像，但是有一个v2.0.4-slim的arm镜像
+docker pull nacos/nacos-server:v2.0.4-slim
+# 需要根据实际版本修改使用的镜像tag
+docker run --name nacos-quick --network=bridge-taxi -e MODE=standalone -e TZ=Asia/Shanghai -p 8848:8848 -p 9848:9848 -p 9849:9849 -d nacos/nacos-server:v2.0.4
 ```
 
 客户端依赖
@@ -239,7 +254,7 @@ docker run --name nacos-quick -e MODE=standalone -e TZ=Asia/Shanghai -p 8848:884
 <dependency>
     <groupId>com.alibaba.cloud</groupId>
     <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-    <version>2021.0.1.0</version>
+    <version>2021.0.4.0</version>
     <exclusions>
         <exclusion>
             <artifactId>spring-cloud-commons</artifactId>
@@ -254,7 +269,7 @@ docker run --name nacos-quick -e MODE=standalone -e TZ=Asia/Shanghai -p 8848:884
 <dependency>
     <groupId>com.alibaba.cloud</groupId>
     <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-    <version>2021.0.1.0</version>
+    <version>2021.0.4.0</version>
     <exclusions>
         <exclusion>
             <artifactId>spring-cloud-commons</artifactId>
@@ -270,11 +285,11 @@ docker run --name nacos-quick -e MODE=standalone -e TZ=Asia/Shanghai -p 8848:884
 
 ### Sentinel安装
 
-dashboard server安装
+[dashboard server下载](https://github.com/alibaba/Sentinel/releases)
 
-```shell
-# TODO
-```
+[dashboard server安装](https://github.com/alibaba/Sentinel/wiki/Dashboard)
+
+因为dashboard十分轻量，官方就没有提供镜像，不过如果有需要的话用户也可以自行制作镜像，较新版本的dashboard只依赖1.8以上的JDK
 
 客户端依赖
 
@@ -283,7 +298,26 @@ dashboard server安装
 <dependency>
     <groupId>com.alibaba.cloud</groupId>
     <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
-    <version>2021.0.1.0</version>
+    <version>2021.0.4.0</version>
+</dependency>
+```
+
+### Seata安装
+
+[seata server docker方式安装](https://hub.docker.com/r/seataio/seata-server)
+
+```shell
+docker pull seataio/seata-server:1.5.2
+docker run --name seata-server --network=bridge-taxi -e TZ=Asia/Shanghai -p 8091:8091 -p 7091:7091 -d seataio/seata-server:1.5.2
+```
+
+客户端依赖
+
+```xml
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+    <version>2021.0.4.0</version>
 </dependency>
 ```
 

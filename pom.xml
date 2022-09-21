@@ -44,6 +44,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>HikariCP</artifactId>
+                    <groupId>com.zaxxer</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -74,9 +80,15 @@
         <!-- spring cloud alibaba nacos -->
         <!--  注意不要升级到2021.1版本，因为那个版本匹配的springboot和spring cloud与2021.0.1.x版本的nacos不一致-->
         <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+            <version>${spring.cloud.starter.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-            <version>2021.0.1.0</version>
+            <version>2021.0.4.0</version>
             <exclusions>
                 <exclusion>
                     <artifactId>spring-cloud-commons</artifactId>
@@ -91,7 +103,7 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-            <version>2021.0.1.0</version>
+            <version>2021.0.4.0</version>
             <exclusions>
                 <exclusion>
                     <artifactId>spring-cloud-commons</artifactId>
@@ -102,6 +114,18 @@
                     <groupId>org.springframework.cloud</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- alibaba sentinel -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+            <version>2021.0.4.0</version>
+        </dependency>
+        <!-- alibaba seata -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+            <version>2021.0.4.0</version>
         </dependency>
         <!-- OpenFeign -->
         <dependency>
@@ -114,12 +138,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-sleuth</artifactId>
             <version>${spring.cloud.starter.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>brave</artifactId>
-                    <groupId>io.zipkin.brave</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
