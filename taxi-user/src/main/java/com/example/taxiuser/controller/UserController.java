@@ -2,8 +2,8 @@ package com.example.taxiuser.controller;
 
 import com.example.bean.TaxiOrder;
 import com.example.bean.TaxiUser;
+import com.example.repository.TaxiUserRepository;
 import com.example.taxiorder.OrderFeign;
-import com.example.taxiuser.repository.TaxiUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -2,6 +2,7 @@ package com.example.taxiorder;
 
 import com.example.bean.TaxiOrder;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -28,4 +29,10 @@ public interface OrderFeign {
 
   @RequestMapping("/findByDriver")
   List<TaxiOrder> getOrderByDriver(Long id);
+
+  @RequestMapping("/order/set")
+  String setOrder(Long orderId, Long userId, String orderName, Long driverId);
+
+  @RequestMapping("/order/driver/update")
+  public void updateOrderDriver(Long driverId, String driverName);
 }

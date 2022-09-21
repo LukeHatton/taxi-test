@@ -10,6 +10,7 @@ import lombok.ToString;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -31,7 +32,7 @@ import java.util.Date;
 @ToString
 public class TaxiOrder {
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
   private Long id;
 
   @Column(name = "order_name", length = 64)
@@ -45,4 +46,7 @@ public class TaxiOrder {
 
   @Column(name = "to_driver")
   private Long toDriver;
+
+  @Column(name = "driver_name")
+  private String driverName;
 }

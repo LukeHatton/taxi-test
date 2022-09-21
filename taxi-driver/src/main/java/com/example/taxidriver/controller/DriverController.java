@@ -2,10 +2,11 @@ package com.example.taxidriver.controller;
 
 import com.example.bean.TaxiDriver;
 import com.example.bean.TaxiOrder;
-import com.example.taxidriver.repository.TaxiDriverRepository;
+import com.example.repository.TaxiDriverRepository;
 import com.example.taxiorder.OrderFeign;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -73,5 +74,21 @@ public class DriverController {
     // 以下相当于声明了两个mono的消费者，同一个消息会被每个监听者单独消费
     mono.subscribe(e -> log.info("==> 异步非阻塞调用返回值：【{}】", e));
     return mono.block();
+  }
+
+  @RequestMapping("/driver/update")
+  @Transactional
+  public void setDriverAndOrder(Long driverId, String driverName) {
+    log.info("==> 进入了【Driver】setDriverAndOrder方法！");
+
+    // 首先要修改driver信息
+    TaxiDriver save = taxiDriverRepository.save(new TaxiDriver(driverId, driverName));
+    log.info("==> 保存后的driver信息：【{}】", save);
+
+    // 然后要使用feign客户端修改order中的driver信息
+    log.info("==> 尝试更新order中的driver信息");
+    orderFeign.updateOrderDriver(driverId, driverName);
+    log.info("==> 更新order中的driver信息完成！");
+
   }
 }

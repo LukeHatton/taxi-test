@@ -1,4 +1,4 @@
-package com.example.taxidriver.repository;
+package com.example.repository;
 
 import com.example.bean.TaxiDriver;
 import org.springframework.data.jpa.repository.JpaRepository;
