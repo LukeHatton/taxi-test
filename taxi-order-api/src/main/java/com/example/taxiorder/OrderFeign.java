@@ -2,8 +2,8 @@ package com.example.taxiorder;
 
 import com.example.bean.TaxiOrder;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -30,9 +30,14 @@ public interface OrderFeign {
   @RequestMapping("/findByDriver")
   List<TaxiOrder> getOrderByDriver(Long id);
 
+  // 使用openFeign进行远程调用，必须将参数封装为对象，或使用@RequestParam标注参数名，否则会导致绑定失败
   @RequestMapping("/order/set")
-  String setOrder(Long orderId, Long userId, String orderName, Long driverId);
+  String setOrder(@RequestParam("orderId") Long orderId,
+                  @RequestParam("userId") Long userId,
+                  @RequestParam("orderName") String orderName,
+                  @RequestParam("driverId") Long driverId);
 
   @RequestMapping("/order/driver/update")
-  public void updateOrderDriver(Long driverId, String driverName);
+  void updateOrderDriver(@RequestParam("driverId") Long driverId,
+                         @RequestParam("driverName") String driverName);
 }
