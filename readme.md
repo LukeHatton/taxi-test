@@ -192,7 +192,27 @@ docker run --name skywalking-ui-test --network=mysql-test -p 8080:8080 -e SW_OAP
 如果要使用spring cloud alibaba组件，组件之间经常也需要交互，如seata server就可以将自己注册到nacos中。因此，需要使用用户定义网络，来允许组件容器之间互相发现
 
 ```shell
-docker network create bridge-taxi
+$ docker network create bridge-taxi
+```
+
+### redis安装
+
+```shell
+# 因为最新的7版本的redis可能在使用上有修改的地方，还是使用上一个大版本的redis
+docker run --name taxi-redis \
+-e TZ=Asia/Shanghai \
+--network=bridge-taxi \
+-p 6379:6379 \
+-d redis:latest
+```
+
+### mysql安装
+
+```shell
+docker run --name taxi-mysql -p 3306:3306 -p 33060:33060 \
+--network=bridge-taxi \
+-e MYSQL_ROOT_PASSWORD=password -e TZ=Asia/Shanghai \
+-d arm64v8/mysql:oracle
 ```
 
 ### zipkin安装
@@ -303,6 +323,10 @@ docker run --name nacos-quick --network=bridge-taxi -e MODE=standalone -e TZ=Asi
 ```
 
 ### Seata安装
+
+> 如果使用arm芯片计算机安装，如m系芯片的macbook，则需要安装支持arm架构的镜像，或者自行构建镜像
+>
+> docker hub中，seata.io/seata支持arm芯片的最低官方镜像版本为1.6.0-SNAPSHOT
 
 [seata server docker方式安装](https://hub.docker.com/r/seataio/seata-server)
 
