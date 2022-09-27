@@ -1,5 +1,8 @@
 package com.example.taxiorder.controller;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.alibaba.csp.sentinel.slots.system.SystemBlockException;
 import com.example.bean.TaxiDriver;
 import com.example.bean.TaxiOrder;
 import com.example.repository.TaxiDriverRepository;
@@ -20,6 +23,7 @@ import java.util.List;
  *
  * @author lizhao 2022/6/10
  */
+@SuppressWarnings("unused")
 @RestController
 @Slf4j
 public class OrderController {
@@ -34,9 +38,30 @@ public class OrderController {
   }
 
   @RequestMapping("/findById")
-  public TaxiOrder getOrderById(Long id) {
+  @SentinelResource(
+    value = "taxiOrder.getOrderById",
+    blockHandler = "getOrderByIdBlockHandler",
+    fallback = "getOrderByIdFallbackHandler")
+  public TaxiOrder getOrderById(Long id) throws SystemBlockException {
     log.info("==> 进入了【Order】findById方法！");
+    if (id == 2) {
+      throw new SystemBlockException("taxiOrder.getOrderById", "模拟抛出SystemBlockException");
+    }
+    if (id == 3) {
+      throw new RuntimeException("模拟抛出运行时异常");
+    }
     return orderRepository.findById(id).orElse(null);
+  }
+
+  // 在sentinel中，因为系统本身过载的原因导致进行限流，称为"降级"；因为下游系统过载而进行限流，称为"熔断"
+  public TaxiOrder getOrderByIdBlockHandler(Long id, BlockException e) {
+    log.warn("发生sentinel异常，自动降级", e);
+    return new TaxiOrder();
+  }
+
+  public TaxiOrder getOrderByIdFallbackHandler(Long id, Throwable throwable) {
+    log.warn("发生系统异常，调用fallback函数", throwable);
+    return new TaxiOrder();
   }
 
   @RequestMapping("/order/findById")

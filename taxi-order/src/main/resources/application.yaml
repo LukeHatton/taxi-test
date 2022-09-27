@@ -29,6 +29,12 @@ spring:
       # 注册中心
       config:
         server-addr: 127.0.0.1:8848
+    sentinel:
+      transport:
+        # 浏览器中dashboard的地址
+        dashboard: localhost:8791
+        # 配置的sentinel server api port，默认8719
+        port: 8719
 seata:
   tx-service-group: app-taxi
   service:

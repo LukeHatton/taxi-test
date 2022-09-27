@@ -209,6 +209,7 @@ docker run --name taxi-redis \
 ### mysql安装
 
 ```shell
+# 根据需要选择适当的mysql镜像，建议使用8.x版本
 docker run --name taxi-mysql -p 3306:3306 -p 33060:33060 \
 --network=bridge-taxi \
 -e MYSQL_ROOT_PASSWORD=password -e TZ=Asia/Shanghai \
