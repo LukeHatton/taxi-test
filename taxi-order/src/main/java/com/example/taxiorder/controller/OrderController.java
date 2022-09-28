@@ -56,12 +56,12 @@ public class OrderController {
   // 在sentinel中，因为系统本身过载的原因导致进行限流，称为"降级"；因为下游系统过载而进行限流，称为"熔断"
   public TaxiOrder getOrderByIdBlockHandler(Long id, BlockException e) {
     log.warn("发生sentinel异常，自动降级", e);
-    return new TaxiOrder();
+    return new TaxiOrder(null, "系统繁忙，请稍后重试", null, null, null, null);
   }
 
   public TaxiOrder getOrderByIdFallbackHandler(Long id, Throwable throwable) {
     log.warn("发生系统异常，调用fallback函数", throwable);
-    return new TaxiOrder();
+    return new TaxiOrder(null, "系统错误，么得办法", null, null, null, null);
   }
 
   @RequestMapping("/order/findById")

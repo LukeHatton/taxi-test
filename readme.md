@@ -312,6 +312,11 @@ docker run --name nacos-quick --network=bridge-taxi -e MODE=standalone -e TZ=Asi
 
 因为dashboard十分轻量，官方就没有提供镜像，不过如果有需要的话用户也可以自行制作镜像，较新版本的dashboard只依赖1.8以上的JDK
 
+```shell
+# 可以根据需要修改启动参数。其中，sentinel dashboard默认使用的api http port为8719
+java -Dserver.port=8791 -Dcsp.sentinel.dashboard.server=localhost:8791 -Dproject.name=sentinel-dashboard -jar sentinel-dashboard-1.8.5.jar
+```
+
 客户端依赖
 
 ```xml
