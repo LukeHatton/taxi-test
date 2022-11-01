@@ -7,6 +7,7 @@ import com.example.bean.TaxiDriver;
 import com.example.bean.TaxiOrder;
 import com.example.repository.TaxiDriverRepository;
 import com.example.repository.TaxiOrderRepository;
+import com.zaxxer.hikari.HikariPoolMXBean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +33,13 @@ public class OrderController {
 
   private final TaxiDriverRepository driverRepository;
 
-  public OrderController(TaxiOrderRepository taxiOrderRepository, TaxiDriverRepository taxiDriverRepository) {
+  private final HikariPoolMXBean hikariPoolMXBean;
+
+  public OrderController(TaxiOrderRepository taxiOrderRepository, TaxiDriverRepository taxiDriverRepository,
+                         HikariPoolMXBean hikariPoolMXBean) {
     this.orderRepository = taxiOrderRepository;
     this.driverRepository = taxiDriverRepository;
+    this.hikariPoolMXBean = hikariPoolMXBean;
   }
 
   @RequestMapping("/findById")
@@ -117,6 +122,15 @@ public class OrderController {
       orderRepository.save(order);
     }
     log.info("==> 根据driverId更新order中的driverName完成！");
+  }
+
+  @RequestMapping("/order/monitor")
+  public String getMonitorInfo() {
+    return "Hikari Pool State : " +
+      "Active=[" + hikariPoolMXBean.getActiveConnections() + "] " +
+      "Idle=[" + hikariPoolMXBean.getIdleConnections() + "] " +
+      "Await=[" + hikariPoolMXBean.getThreadsAwaitingConnection() + "] " +
+      "Total=[" + hikariPoolMXBean.getTotalConnections() + "] ";
   }
 
 }
