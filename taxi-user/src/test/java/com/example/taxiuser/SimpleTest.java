@@ -8,9 +8,12 @@ import lombok.Cleanup;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.expression.BeanFactoryResolver;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.SimpleEvaluationContext;
@@ -25,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,8 +43,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SimpleTest {
 
   private static final Logger log = LoggerFactory.getLogger(SimpleTest.class);
-
-  volatile int i = 1;
 
   public static void main1(String[] args) {
     ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
@@ -118,18 +120,18 @@ public class SimpleTest {
   }
 
   // 演示SpEL自动类型转换
-  static class Simple{
+  static class Simple {
     public List<Boolean> booleanList = new ArrayList<>();
   }
 
   // 演示SpEL自动增长数组
-  static class Demo{
+  static class Demo {
     public List<String> list;
   }
 
   // 测试SPEL能否被用来判断响应码
   @Test
-  public void testForSuccessCode(){
+  public void testForSuccessCode() {
     RequestWrapper request1 = new RequestWrapper(1, "request 1");
     RequestWrapper request2 = new RequestWrapper(2, "request 2");
 
@@ -150,7 +152,7 @@ public class SimpleTest {
     Simple simple = new Simple();
     simple.booleanList.add(true);
     SimpleEvaluationContext context = SimpleEvaluationContext.forReadOnlyDataBinding().build();
-    parser.parseExpression("booleanList[0]").setValue(context,simple,"false");
+    parser.parseExpression("booleanList[0]").setValue(context, simple, "false");
     Boolean x = simple.booleanList.get(0);
     System.out.println(x);
 
@@ -165,5 +167,118 @@ public class SimpleTest {
 
     System.out.println("---");
   }
+
+  public static String reverseString(String input) {
+    StringBuilder backwards = new StringBuilder(input.length());
+    for (int i = 0; i < input.length(); i++) {
+      backwards.append(input.charAt(input.length() - 1 - i));
+    }
+    return backwards.toString();
+  }
+
+  @Test
+  void test06() throws NoSuchMethodException {
+    /* ================ SpEL reference: function ================= */
+    /*
+     * 可以在SpEL中调用类级别的static方法和函数
+     * 通过'#'来访问context中的函数，或context中定义的bean
+     */
+    ExpressionParser parser = new SpelExpressionParser();
+    SimpleEvaluationContext context = SimpleEvaluationContext.forReadOnlyDataBinding().build();
+    context.setVariable("reverseString", SimpleTest.class.getDeclaredMethod("reverseString", String.class));
+
+    String value = parser.parseExpression("#reverseString('hello')").getValue(context, String.class);
+    System.out.println(value);
+
+    /* ================ SpEL reference: bean reference ================= */
+    /*
+     * 使用'@bean_name'访问bean容器中的bean
+     * 使用'&bean_name'访问bean容器中的工厂bean（即那些用来创建bean的bean）
+     * 因为需要注册一个BeanResolver，这个对象只能在Spring环境中使用，因此这里就不演示了
+     */
+    StandardEvaluationContext context1 = new StandardEvaluationContext();
+    context1.setBeanResolver(new BeanFactoryResolver(new GenericApplicationContext()));
+  }
+
+  @Test
+  void test07() {
+    /* ================ SpEL reference: ternary operator ================= */
+    // 在SpEL中使用三元操作符，即 if then else
+    RequestWrapper request = new RequestWrapper(1, "request 1");
+
+    ExpressionParser parser = new SpelExpressionParser();
+    Expression expression = parser.parseExpression("getCode() eq 1 ? 'true' : 'false'");
+    String value = expression.getValue(request, String.class);
+
+    System.out.println(value);
+
+    /* ================ SpEL reference: elvis operator ================= */
+    // 其实就是对三元操作符的一个简化，可以用来应用默认值。在properties文件中的默认值格式就和elvis operator很像
+    RequestWrapper request1 = new RequestWrapper(null, "request 2");
+    Expression expression1 = parser.parseExpression("code?:'blablabla'");
+    String value1 = expression1.getValue(request1, String.class);
+
+    System.out.println(value1);
+  }
+
+  @Test
+  void test08() {
+    /* ================ SpEL reference: safe navigation operator ================= */
+    /*
+     * 当处理对象类型时，经常需要进行非空判断
+     * 如使用mapper从数据库中查找某条记录，随后操作这个对象的属性。可能出现这种情况：没有查得数据，因此后续的对象属性处理会抛出空指针异常
+     * 在SpEL中，可以使用safe navigation operator来避免这个问题：对于null指针，获取对象的属性值会直接返回一个null，而不是抛出异常
+     */
+    RequestWrapper request = null;
+    ExpressionParser parser = new SpelExpressionParser();
+    // 通过#root指代当前传入parser的root object
+    Expression expression = parser.parseExpression("#root?.code");
+    Object value = expression.getValue(request);
+    System.out.println(value);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  void test09() {
+    /* ================ SpEL reference: collection ================= */
+    /*
+     * SpEL支持对Iterable和Map接口实现的选择和注入。以下会分别展示如何进行这种操作
+     * 选择语法：'.?[selectionExpression]'
+     * 选择第一个符合条件的元素：'.^[selectionExpression]'
+     * 选择最后一个符合条件的元素：'.$[selectionExpression]'
+     * map可以用SpEL预置变量'key'和'value'来指代key和value
+     */
+    List<RequestWrapper> list = new ArrayList<>(Arrays.asList(
+      new RequestWrapper(1, "req1"),
+      new RequestWrapper(2, "req2"),
+      new RequestWrapper(3, "req3")));
+
+    ExpressionParser parser = new SpelExpressionParser();
+    List<RequestWrapper> value = (List<RequestWrapper>) parser.parseExpression("#root.?[code > 1]").getValue(list);
+    System.out.println(value);
+
+    /*
+     * 注入语法：'.![projectionExpression]'
+     */
+    List<Integer> list1 = (List<Integer>) parser.parseExpression("#root.![code]").getValue(list);
+    System.out.println(list1);
+
+  }
+
+  @Test
+  void test010() {
+    /* ================ SpEL reference: expression templating ================= */
+    /*
+     * 可以将字符串常量与SpEL表达式写在一个字符串中，并用指定的模式来区分常量与SpEL表达式
+     * 需要在使用SpelExpressionParser时传入一个ParserContext对象，不传的话就是null，parser会将整个字符串都作为SpEL表达式解析
+     * 默认使用TemplateParserContext中定义的匹配字符，不过用户也可以设置自己的匹配字符
+     */
+    ExpressionParser parser = new SpelExpressionParser();
+    String value = parser
+      .parseExpression("A random number is #{T(java.lang.Math).random()}", new TemplateParserContext())
+      .getValue(String.class);
+    System.out.println(value);
+  }
+
 
 }

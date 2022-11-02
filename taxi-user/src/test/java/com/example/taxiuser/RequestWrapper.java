@@ -1,5 +1,10 @@
 package com.example.taxiuser;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 /**
  * <p>Project: taxi-test
  * <p>Description:
@@ -7,31 +12,10 @@ package com.example.taxiuser;
  *
  * @author lizhao 2022/10/28
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RequestWrapper {
   Integer code;
   String req;
-
-  public RequestWrapper() {
-  }
-
-  public RequestWrapper(Integer code, String req) {
-    this.code = code;
-    this.req = req;
-  }
-
-  public Integer getCode() {
-    return code;
-  }
-
-  public void setCode(Integer code) {
-    this.code = code;
-  }
-
-  public String getReq() {
-    return req;
-  }
-
-  public void setReq(String req) {
-    this.req = req;
-  }
 }
